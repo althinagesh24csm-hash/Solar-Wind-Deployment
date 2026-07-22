@@ -39,7 +39,7 @@ def get_current_user(
         )
 
         print("Decoded Payload:", payload)
-
+        print("User Role from Token:", payload.get("role"))
         email = payload.get("sub")
 
         if email is None:
@@ -62,5 +62,5 @@ def get_current_user(
             status_code=401,
             detail="User not found"
         )
-
+    print("Role from Database:", user.role)
     return user
