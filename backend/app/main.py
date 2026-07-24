@@ -13,6 +13,7 @@ from app.api.project import router as project_router
 from app.models.site import Site
 from app.api.prediction import router as prediction_router
 from app.api.assessment import router as assessment_router
+from app.api.suitability import router as suitability_router
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
@@ -30,6 +31,7 @@ app.include_router(asset_router)
 app.include_router(environmental_router)
 app.include_router(prediction_router)
 app.include_router(assessment_router)
+app.include_router(suitability_router)
 
 @app.get("/")
 def home():
