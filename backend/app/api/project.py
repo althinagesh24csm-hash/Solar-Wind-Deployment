@@ -41,13 +41,25 @@ def create_project(
 
 
 @router.get("/", response_model=list[ProjectResponse])
-def get_projects(db: Session = Depends(get_db)):
-    return db.query(Project).all()
+def get_projects(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return db.query(Project).filter(
+        Project.created_by == current_user.id
+    ).all()
 
 
 @router.get("/{project_id}", response_model=ProjectResponse)
-def get_project(project_id: int, db: Session = Depends(get_db)):
-    project = db.query(Project).filter(Project.id == project_id).first()
+def get_project(
+    project_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    project = db.query(Project).filter(
+        Project.id == project_id,
+        Project.created_by == current_user.id
+    ).first()
 
     if not project:
         raise HTTPException(
@@ -67,18 +79,15 @@ def update_project(
 ):
     require_roles(current_user, ["admin", "manager"])
 
-    project = db.query(Project).filter(Project.id == project_id).first()
+    project = db.query(Project).filter(
+        Project.id == project_id,
+        Project.created_by == current_user.id
+    ).first()
 
     if not project:
         raise HTTPException(
             status_code=404,
             detail="Project not found"
-        )
-
-    if project.created_by != current_user.id:
-        raise HTTPException(
-            status_code=403,
-            detail="You are not allowed to update this project"
         )
 
     project.project_name = updated_project.project_name
@@ -90,26 +99,24 @@ def update_project(
 
     return project
 
+
 @router.delete("/{project_id}")
 def delete_project(
     project_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    require_roles(current_user, ["admin", "manager"])
+    require_roles(current_user, ["admin"])
 
-    project = db.query(Project).filter(Project.id == project_id).first()
+    project = db.query(Project).filter(
+        Project.id == project_id,
+        Project.created_by == current_user.id
+    ).first()
 
     if not project:
         raise HTTPException(
             status_code=404,
             detail="Project not found"
-        )
-
-    if project.created_by != current_user.id:
-        raise HTTPException(
-            status_code=403,
-            detail="You are not allowed to delete this project"
         )
 
     db.delete(project)
