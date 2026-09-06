@@ -1,0 +1,276 @@
+.investment-page {
+  min-height: 100vh;
+  padding: 35px;
+  background: #f8fafc;
+}
+
+.investment-header {
+  margin-bottom: 30px;
+}
+
+.investment-header h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 32px;
+}
+
+.investment-header p {
+  color: #64748b;
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+.investment-search {
+  display: flex;
+  align-items: end;
+  gap: 18px;
+  background: white;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.07);
+  margin-bottom: 25px;
+}
+
+.investment-search div {
+  flex: 1;
+}
+
+.investment-search label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #334155;
+}
+
+.investment-search input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.investment-search button {
+  padding: 13px 22px;
+  border: none;
+  border-radius: 9px;
+  background: #0f766e;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.investment-search button:hover {
+  background: #115e59;
+}
+
+.investment-search button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.investment-error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.region-result {
+  display: flex;
+  justify-content: space-between;
+  background: white;
+  padding: 18px 22px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,.06);
+}
+
+.region-result span {
+  color: #64748b;
+}
+
+.region-result strong {
+  color: #0f766e;
+}
+
+.recommendation-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #0f766e, #115e59);
+  color: white;
+  padding: 25px;
+  border-radius: 16px;
+  margin-bottom: 25px;
+  box-shadow: 0 8px 20px rgba(15,118,110,.2);
+}
+
+.recommendation-card span {
+  opacity: .85;
+}
+
+.recommendation-card h2 {
+  margin: 6px 0 0;
+  font-size: 28px;
+}
+
+.recommendation-text {
+  max-width: 430px;
+  line-height: 1.6;
+  opacity: .9;
+}
+
+.investment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.technology-card {
+  background: white;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 7px 20px rgba(0,0,0,.08);
+}
+
+.solar-card {
+  border-top: 5px solid #f59e0b;
+}
+
+.wind-card {
+  border-top: 5px solid #2563eb;
+}
+
+.technology-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.technology-icon {
+  font-size: 38px;
+}
+
+.technology-title h2 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.technology-title p {
+  margin: 5px 0 0;
+  color: #64748b;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.metric {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.metric span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 7px;
+}
+
+.metric strong {
+  color: #0f172a;
+  font-size: 19px;
+}
+
+.metric.highlight {
+  background: #ecfdf5;
+}
+
+.metric.highlight strong {
+  color: #047857;
+}
+
+.financial-summary,
+.assumptions {
+  background: white;
+  margin-top: 25px;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 7px 20px rgba(0,0,0,.07);
+}
+
+.financial-summary h2,
+.assumptions h2 {
+  margin-top: 0;
+  color: #0f172a;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.summary-grid div {
+  padding: 18px;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.summary-grid span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.summary-grid strong {
+  color: #0f766e;
+  font-size: 18px;
+}
+
+.assumption-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.assumption-grid p {
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 10px;
+  color: #64748b;
+}
+
+.assumption-grid strong {
+  display: block;
+  color: #0f172a;
+  margin-top: 5px;
+}
+
+@media (max-width: 900px) {
+  .investment-grid,
+  .summary-grid,
+  .assumption-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recommendation-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .investment-search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

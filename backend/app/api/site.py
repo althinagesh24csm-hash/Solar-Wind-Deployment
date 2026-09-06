@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 from app.models.site import Site
+from app.models.project import Project
 from app.models.user import User
 from app.core.dependencies import get_current_user
 from app.core.permissions import require_roles
@@ -43,12 +44,37 @@ def create_site(
     return new_site
 
 
+# ---------------------------------
+# GET SITES BY REGION
+# ---------------------------------
+
 @router.get("/", response_model=list[SiteResponse])
-def get_sites(db: Session = Depends(get_db)):
-    return db.query(Site).all()
+def get_sites(
+    region: str | None = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(Site)
+
+    if region:
+        query = (
+            query
+            .join(Project, Site.project_id == Project.id)
+            .filter(Project.location.ilike(f"%{region}%"))
+        )
+
+    return query.all()
+
+
 @router.get("/{site_id}", response_model=SiteResponse)
-def get_site(site_id: int, db: Session = Depends(get_db)):
-    site = db.query(Site).filter(Site.id == site_id).first()
+def get_site(
+    site_id: int,
+    db: Session = Depends(get_db)
+):
+    site = (
+        db.query(Site)
+        .filter(Site.id == site_id)
+        .first()
+    )
 
     if not site:
         raise HTTPException(
@@ -57,6 +83,8 @@ def get_site(site_id: int, db: Session = Depends(get_db)):
         )
 
     return site
+
+
 @router.put("/{site_id}", response_model=SiteResponse)
 def update_site(
     site_id: int,
@@ -66,7 +94,11 @@ def update_site(
 ):
     require_roles(current_user, ["admin", "manager"])
 
-    site = db.query(Site).filter(Site.id == site_id).first()
+    site = (
+        db.query(Site)
+        .filter(Site.id == site_id)
+        .first()
+    )
 
     if not site:
         raise HTTPException(
@@ -85,12 +117,13 @@ def update_site(
     site.longitude = updated_site.longitude
     site.capacity_mw = updated_site.capacity_mw
     site.site_type = updated_site.site_type
-    site.project_id = updated_site.project_id
 
     db.commit()
     db.refresh(site)
 
     return site
+
+
 @router.delete("/{site_id}")
 def delete_site(
     site_id: int,
@@ -99,7 +132,11 @@ def delete_site(
 ):
     require_roles(current_user, ["admin", "manager"])
 
-    site = db.query(Site).filter(Site.id == site_id).first()
+    site = (
+        db.query(Site)
+        .filter(Site.id == site_id)
+        .first()
+    )
 
     if not site:
         raise HTTPException(

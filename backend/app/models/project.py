@@ -10,10 +10,9 @@ class Project(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     project_name = Column(String(200), nullable=False)
-
     description = Column(Text)
-
     location = Column(String(200))
+    region = Column(String(200), nullable=False)
 
     created_by = Column(Integer, ForeignKey("users.id"))
 

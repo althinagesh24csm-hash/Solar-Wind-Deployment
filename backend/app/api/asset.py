@@ -3,10 +3,19 @@ from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 from app.models.asset import Asset
+from app.models.site import Site
+from app.models.project import Project
 from app.models.user import User
-from app.schemas.asset import AssetCreate, AssetUpdate, AssetResponse
+
+from app.schemas.asset import (
+    AssetCreate,
+    AssetUpdate,
+    AssetResponse
+)
+
 from app.core.dependencies import get_current_user
 from app.core.permissions import require_roles
+
 
 router = APIRouter(
     prefix="/assets",
@@ -38,17 +47,44 @@ def create_asset(
     return new_asset
 
 
+# ---------------------------------
+# GET ASSETS BY REGION
+# ---------------------------------
+
 @router.get("/", response_model=list[AssetResponse])
-def get_assets(db: Session = Depends(get_db)):
-    return db.query(Asset).all()
+def get_assets(
+    region: str | None = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(Asset)
+
+    if region:
+        query = (
+            query
+            .join(Site, Asset.site_id == Site.id)
+            .join(Project, Site.project_id == Project.id)
+            .filter(Project.location.ilike(f"%{region}%"))
+        )
+
+    return query.all()
 
 
 @router.get("/{asset_id}", response_model=AssetResponse)
-def get_asset(asset_id: int, db: Session = Depends(get_db)):
-    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+def get_asset(
+    asset_id: int,
+    db: Session = Depends(get_db)
+):
+    asset = (
+        db.query(Asset)
+        .filter(Asset.id == asset_id)
+        .first()
+    )
 
     if not asset:
-        raise HTTPException(status_code=404, detail="Asset not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Asset not found"
+        )
 
     return asset
 
@@ -62,10 +98,17 @@ def update_asset(
 ):
     require_roles(current_user, ["admin", "manager"])
 
-    db_asset = db.query(Asset).filter(Asset.id == asset_id).first()
+    db_asset = (
+        db.query(Asset)
+        .filter(Asset.id == asset_id)
+        .first()
+    )
 
     if not db_asset:
-        raise HTTPException(status_code=404, detail="Asset not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Asset not found"
+        )
 
     db_asset.asset_name = asset.asset_name
     db_asset.asset_type = asset.asset_type
@@ -87,12 +130,21 @@ def delete_asset(
 ):
     require_roles(current_user, ["admin"])
 
-    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+    asset = (
+        db.query(Asset)
+        .filter(Asset.id == asset_id)
+        .first()
+    )
 
     if not asset:
-        raise HTTPException(status_code=404, detail="Asset not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Asset not found"
+        )
 
     db.delete(asset)
     db.commit()
 
-    return {"message": "Asset deleted successfully"}
+    return {
+        "message": "Asset deleted successfully"
+    }

@@ -1,49 +1,44 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
-from app.schemas.investment import (
-    InvestmentRequest,
-    InvestmentResponse
-)
+from app.database.database import get_db
+from app.models.analysis import Analysis
+from app.services.investment_service import calculate_investment
+
 
 router = APIRouter(
     prefix="/investment",
-    tags=["Investment Recommendation"]
+    tags=["Investment Analysis"]
 )
 
 
-@router.post("/", response_model=InvestmentResponse)
-def investment_analysis(data: InvestmentRequest):
-
-    annual_revenue = round(
-        data.annual_energy_output * data.electricity_price,
-        2
+@router.get("/")
+def get_investment(
+    db: Session = Depends(get_db)
+):
+    # Get the latest completed analysis
+    analysis = (
+        db.query(Analysis)
+        .order_by(Analysis.created_at.desc())
+        .first()
     )
 
-    annual_profit = round(
-        annual_revenue - data.maintenance_cost,
-        2
-    )
-
-    if annual_profit > 0:
-        payback_period = round(
-            data.project_cost / annual_profit,
-            2
+    if not analysis:
+        raise HTTPException(
+            status_code=404,
+            detail="No analysis available. Run a regional analysis first."
         )
-    else:
-        payback_period = 0
 
-    if payback_period == 0:
-        recommendation = "Not Recommended"
-    elif payback_period <= 5:
-        recommendation = "Highly Recommended"
-    elif payback_period <= 8:
-        recommendation = "Recommended"
-    else:
-        recommendation = "Needs Further Analysis"
-
-    return InvestmentResponse(
-        annual_revenue=annual_revenue,
-        annual_profit=annual_profit,
-        payback_period=payback_period,
-        recommendation=recommendation
+    # Calculate investment using latest analysis
+    investment = calculate_investment(
+        solar_annual_energy_mwh=analysis.solar_annual_energy,
+        wind_annual_energy_mwh=analysis.wind_annual_energy
     )
+
+    return {
+        "analysis_id": analysis.id,
+        "region": analysis.region,
+        "solar_annual_energy_mwh": analysis.solar_annual_energy,
+        "wind_annual_energy_mwh": analysis.wind_annual_energy,
+        "investment": investment
+    }
